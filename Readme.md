@@ -15,4 +15,4 @@ python main.py
 ```
 
 ## Additional Details
-The code is currently designed and developed as per the requirements of the Project Midpoint check and will not provide any output as of now. This is meant to only showcase our progress with a well designed compilable code.
+The code is currently designed and developed as per the requirements of the Project Midpoint check and will not provide much metrics as output as of now. This is meant to showcase our progress with a well designed compilable code with major event simulation functionalities being developed along with a few other important classes and a simple cache policy.
