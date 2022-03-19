@@ -1,6 +1,8 @@
+from time import time
 from urllib import request
 import numpy as np
 from queue import PriorityQueue, Queue
+import time
 
 from models.cache import Cache
 from models.file import File
@@ -14,15 +16,15 @@ class Simulation:
         self.clock = 0.0
         self.ra = 15
         self.rc = 1000
-        self.queue: PriorityQueue[Event] = PriorityQueue()
+        self.queue = PriorityQueue()
         self.cache = Cache()
-        self.alpha_pareto_file_size = 5.0 ##must be float
-        self.alpha_pareto_file_id = 100.0 ##must be float
-        self.lamda_inter_arrival = 1000
+        self.alpha_pareto_file_size = 1.0 ##must be float
+        self.alpha_pareto_file_id = 10.0 ##must be float
+        self.lamda_inter_arrival = 10
         self.total_time_of_requests_served = 0
         self.num_of_request_served = 0
         self.fifo_queue: Queue[Request] = Queue(maxsize=0)
-        self.max_request = 1000 #simulation to be run over {} requests
+        self.max_request = 30 #simulation to be run over {} requests
 
     def handle_new_request_event(self, event: Event):
         request = event.get_request()
@@ -45,7 +47,7 @@ class Simulation:
         self.num_of_request_served += 1
         total_time = self.clock - request.get_creation_time()
         self.total_time_of_requests_served += total_time
-        print('request: ' + request.get_requestid() + ' has been served at ' + self.clock)
+        print('request: {} has been served at {}'.format(request.get_requestid(), self.clock))
 
     def handle_arrive_at_queue_event(self, event: Event):
         request = event.get_request()
@@ -71,10 +73,10 @@ class Simulation:
             self.add_new_event(new_depart_queue_event)
 
     def add_new_event(self, event: Event):
-        self.queue.put(event.get_event_time(), event)
+        self.queue.put((event.get_event_time(), event))
 
     def get_roundtrip_time(self):
-        return np.random.lognormal() #check
+        return np.random.lognormal(mean=0.5, sigma=0.4) #check
 
     def generate_new_request_event(self):
         event_time = self.clock + self.get_interarrival()
@@ -93,24 +95,25 @@ class Simulation:
         return np.random.pareto(a=self.alpha_pareto_file_id)
     
     def run(self):
+        time.sleep(5)
         self.generate_new_request_event()
-        while not self.queue.empty:
-            event = self.queue.get()
+        while self.queue.qsize() > 0:
+            event: Event = self.queue.get()[1]
+            self.clock += event.get_event_time()
             event_type = event.get_type()
+            #print('file size {}'.format(event.get_request().get_response_file_size()))
+            #print('clock: {}  type:{}'.format(self.clock, event_type))
+
             match event_type:
                 case "new_request": 
                     self.handle_new_request_event(event)
-                    break
                 case "arrive_at_queue":
                     self.handle_arrive_at_queue_event(event)
-                    break
                 case "depart_queue":
                     self.handle_depart_queue_event(event)
-                    break
                 case "file_received":
                     self.handle_file_received_event(event)
-                    break
-        return self.total_time_of_requests_served / self.num_of_request_served
+        print('average simulation time for {} requests is {} ms'.format(self.num_of_request, self.total_time_of_requests_served / self.num_of_request_served))
 
 
 np.random.seed(0)
