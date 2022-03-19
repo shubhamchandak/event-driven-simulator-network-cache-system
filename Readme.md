@@ -1,4 +1,9 @@
-# Probability for CS Project - Shubham Chandak (shubham.chandak@ufl.edu) and Vinit Jain (vinitjain@ufl.edu)
+# Probability for CS Project - 
+
+## Team members - 
+
+### 1. Shubham Chandak (shubham.chandak@ufl.edu) 
+### 2. Vinit Jain (vinitjain@ufl.edu)
 
 ## Installation
 
