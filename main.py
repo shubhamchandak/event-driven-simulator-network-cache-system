@@ -24,7 +24,7 @@ class Simulation:
         self.total_time_of_requests_served = 0
         self.num_of_request_served = 0
         self.fifo_queue: Queue[Request] = Queue(maxsize=0)
-        self.max_request = 30 #simulation to be run over {} requests
+        self.max_request = 1000 #simulation to be run over {} requests
 
     def handle_new_request_event(self, event: Event):
         request = event.get_request()
@@ -37,6 +37,7 @@ class Simulation:
         else: 
             new_event_time = self.clock + self.get_roundtrip_time()
             request.set_response_file_size(self.get_new_file_size())
+            #print('requestid: {}  roundtrip_time: {}'.format(request.get_requestid(), new_event_time-self.clock))
             arrive_at_queue_event = Event("arrive_at_queue", self.clock, new_event_time, request)
             self.add_new_event(arrive_at_queue_event)
             if(self.num_of_request < self.max_request):
@@ -47,11 +48,12 @@ class Simulation:
         self.num_of_request_served += 1
         total_time = self.clock - request.get_creation_time()
         self.total_time_of_requests_served += total_time
-        print('request: {} has been served at {}'.format(request.get_requestid(), self.clock))
+        #print('request: {} has been served at {}'.format(request.get_requestid(), self.clock))
 
     def handle_arrive_at_queue_event(self, event: Event):
         request = event.get_request()
         file_size = request.get_response_file_size()
+        print('request: {}, file_size: {}, '.format(request.get_requestid(), file_size))
         if(self.fifo_queue.empty()):
             event_time = self.clock + file_size / self.ra
             new_event = Event("depart_queue", self.clock, event_time, request)
@@ -99,10 +101,10 @@ class Simulation:
         self.generate_new_request_event()
         while self.queue.qsize() > 0:
             event: Event = self.queue.get()[1]
-            self.clock += event.get_event_time()
+            self.clock = event.get_event_time()
             event_type = event.get_type()
             #print('file size {}'.format(event.get_request().get_response_file_size()))
-            #print('clock: {}  type:{}'.format(self.clock, event_type))
+            #print('request:{}  type:{}  clock: {}'.format(event.get_request().get_requestid(), event_type, self.clock))
 
             match event_type:
                 case "new_request": 
@@ -113,7 +115,7 @@ class Simulation:
                     self.handle_depart_queue_event(event)
                 case "file_received":
                     self.handle_file_received_event(event)
-        print('average simulation time for {} requests is {} ms'.format(self.num_of_request, self.total_time_of_requests_served / self.num_of_request_served))
+        print('average simulation time for {} requests is {} sec'.format(self.num_of_request, self.total_time_of_requests_served / self.num_of_request_served))
 
 
 np.random.seed(0)
