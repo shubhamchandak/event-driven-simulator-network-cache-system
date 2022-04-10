@@ -18,8 +18,8 @@ class Simulation:
         self.ra = float(input.access_link_bandwidth)
         self.rc = float(input.network_bandwidth)
         self.queue = PriorityQueue()
-        self.cache = Cache()
-        self.alpha_pareto_file_size = 1.0 ##must be float
+        self.cache = Cache(input.cache_type, input.cache_size)
+        self.alpha_pareto_file_size = 2.0 ##must be float
         self.alpha_pareto_file_id = 10.0 ##must be float
         self.lamda_inter_arrival = float(input.request_rate)
         self.total_time_of_requests_served = 0
@@ -30,8 +30,8 @@ class Simulation:
     def handle_new_request_event(self, event: Event):
         request = event.get_request()
         file_id = request.get_file_id()
-        if self.cache.cache_available(file_id):
-            file = self.cache.get_file(file_id)
+        if self.cache.available(file_id):
+            file = self.cache.get(file_id)
             new_event_time = self.clock + file.get_size() / self.rc
             file_received_event = Event("file_received", self.clock, new_event_time, request)
             self.add_new_event(file_received_event)
@@ -54,7 +54,7 @@ class Simulation:
     def handle_arrive_at_queue_event(self, event: Event):
         request = event.get_request()
         file_size = request.get_response_file_size()
-        print('request: {}, file_size: {}, '.format(request.get_requestid(), file_size))
+        #print('request: {}, file_size: {}, '.format(request.get_requestid(), file_size))
         if(self.fifo_queue.empty()):
             event_time = self.clock + file_size / self.ra
             new_event = Event("depart_queue", self.clock, event_time, request)
@@ -65,7 +65,7 @@ class Simulation:
     def handle_depart_queue_event(self, event: Event):
         request = event.get_request()
         new_file = File(request.get_file_id(), request.get_response_file_size())
-        self.cache.add_file(new_file)
+        self.cache.put(new_file.id, new_file)
         new_event_time = self.clock + new_file.get_size() / self.rc
         new_event = Event("file_received", self.clock, new_event_time, request)
         self.add_new_event(new_event)
@@ -95,11 +95,12 @@ class Simulation:
         return np.random.pareto(a=self.alpha_pareto_file_size)
 
     def get_new_file_id(self):
-        return np.random.pareto(a=self.alpha_pareto_file_id)
+        a = np.random.pareto(a=self.alpha_pareto_file_id)
+        print(a)
+        return a
     
     def run(self):
         print("start")
-        time.sleep(5)
         self.generate_new_request_event()
         while self.queue.qsize() > 0:
             event: Event = self.queue.get()[1]
