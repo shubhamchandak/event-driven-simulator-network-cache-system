@@ -7,7 +7,6 @@ class ConfigReader:
     res = Config()
     path = ''
     def __init__(self, path: str):
-        print("path: ")
         path = os.path.join(os.path.dirname(__file__), 'config', path)
         print(path)
         if (path is None or not os.path.isfile(path)):
@@ -17,7 +16,6 @@ class ConfigReader:
 
         parser = configparser.RawConfigParser()
         parser.read(path)
-        print(parser.sections())
         simulation_section = 'Simulation'
         self.res.total_req = parser.get(simulation_section, 'Total_Requests')
         self.res.time_limit = parser.get(simulation_section, 'Time_Limit')

@@ -4,5 +4,5 @@ class File:
         self.size = file_size
     def get_size(self):
         return self.size
-    def set_file_size(self, size):
-        self.size = size
+    def get_id(self):
+        return self.id

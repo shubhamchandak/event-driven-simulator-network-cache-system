@@ -1,3 +1,4 @@
+from __future__ import annotations
 from abc import abstractmethod
 from collections import OrderedDict
 from functools import lru_cache
@@ -7,8 +8,9 @@ from models.file import File
 
 
 class Cache:
-    def __init__(self, cache_type: str, capacity: int):
-        if type == 'LRU':
+
+    def create_cache(cache_type: str, capacity: int) -> Cache:
+        if cache_type == 'LRU':
             return LruCache(capacity)
 
     @abstractmethod
@@ -23,18 +25,24 @@ class Cache:
     def put(self, key: number, value: File):
         pass 
 
+    @abstractmethod
+    def size(self):
+        pass 
+
 
 class LruCache(Cache):
-    def __init__(self, capacity):
-        self.capacity = capacity
+    def __init__(self, capacity: int):
+        self.capacity: int = capacity
         self.cache = OrderedDict()
 
     def get(self, key):
         if key not in self.cache:
+            print('cache is empty! - returning none')
             return None
         else:
             self.cache.move_to_end(key)
-            return self.cache[key]
+            res =  self.cache[key]
+            return res
     
     def available(self, key) -> bool:
         return key in self.cache
@@ -44,4 +52,7 @@ class LruCache(Cache):
         self.cache.move_to_end(key)
         if len(self.cache) > self.capacity:
             self.cache.popitem(last = False)
+        #print('insert file {} to cache. current cache size is {}'.format(key, self.size()))
 
+    def size(self):
+        return len(self.cache)
