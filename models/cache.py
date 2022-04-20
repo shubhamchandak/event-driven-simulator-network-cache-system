@@ -2,6 +2,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from collections import OrderedDict
 from functools import lru_cache
+import queue
 
 from numpy import number
 from models.file import File
@@ -56,3 +57,32 @@ class LruCache(Cache):
 
     def size(self):
         return len(self.cache)
+
+
+class FIFOCache(Cache):
+    def __init__(self, capacity):
+        self.capacity = capacity
+        self.dict = {}
+        self.list = []
+
+    def get(self, key):
+        if key not in self.cache:
+            print('cache is empty! - returning none')
+            return None
+        return self.cache.get(key, None)
+
+    def size(self):
+        return len(self.list)
+
+    def available(self, key) -> bool:
+        return key in self.dict
+
+    def put(self, key, value, file: File):
+        if key in self.dict:
+            self.list.remove(key)
+        
+        self.list.append(key)
+        self.dict[key] = value
+
+        if(len(self.list) > self.capacity):
+            del dict[list.pop(0)]
