@@ -21,11 +21,14 @@ class Simulation:
         self.alpha_pareto_file_id = 10.0 ##must be float
         self.lamda_inter_arrival = float(input.request_rate)
         self.total_time_of_requests_served = 0
+        self.round_trip_mean = float(input.round_trip_mean)
+        self.round_trip_sd = float(input.round_trip_sd)
         self.num_of_request_served = 0
         self.fifo_queue: Queue[Request] = Queue(maxsize=0)
         self.max_request = int(input.total_req) #simulation to be run over {} requests
         self.cache_miss_count = 0
         self.time_limit = int(input.time_limit)
+        self.result_metrics = [] #(request_id, arrived_seq_id, total_response_time, cache_miss_rate, clock)
 
     def handle_new_request_event(self, event: Event):
         request = event.get_request()
@@ -49,7 +52,11 @@ class Simulation:
         self.num_of_request_served += 1
         total_time = self.clock - request.get_creation_time()
         self.total_time_of_requests_served += total_time
+        self.result_metrics.append(self.log_after_file_received(request, total_time))
         #print('request: {} has been served at {}'.format(request.get_requestid(), self.clock))
+
+    def log_after_file_received(self, request: Request, total_time): # return (request_id, arrived_seq_id, total_response_time, cache_miss_rate, clock)
+        return (request.get_requestid(), self.num_of_request_served, total_time, self.cache_miss_count/self.num_of_request_served, self.clock)
 
     def handle_arrive_at_queue_event(self, event: Event):
         request = event.get_request()
@@ -80,7 +87,7 @@ class Simulation:
         self.queue.put((event.get_event_time(), event))
 
     def get_roundtrip_time(self):
-        return np.random.lognormal(mean=0.5, sigma=0.4) #check
+        return np.random.lognormal(mean=self.round_trip_mean, sigma=self.round_trip_sd) #check
 
     def generate_new_request_event(self):
         event_time = self.clock + self.get_interarrival()
@@ -124,4 +131,5 @@ class Simulation:
                     print('event not supported!')
         print('clock: {}'.format(self.clock))
         print('average simulation time for {} requests is {}sec and cache miss rate is {}'.format(self.num_of_request_served, self.total_time_of_requests_served / self.num_of_request_served, self.cache_miss_count/ self.num_of_request_served))
+        return self.result_metrics
 
