@@ -13,6 +13,8 @@ class Cache:
     def create_cache(cache_type: str, capacity: int) -> Cache:
         if cache_type == 'LRU':
             return LruCache(capacity)
+        if cache_type == 'FIFO':
+            return FIFOCache(capacity)
 
     @abstractmethod
     def get(self, key: number) -> File:
@@ -66,10 +68,10 @@ class FIFOCache(Cache):
         self.list = []
 
     def get(self, key):
-        if key not in self.cache:
-            print('cache is empty! - returning none')
-            return None
-        return self.cache.get(key, None)
+        # if key not in self.dict:
+        #     print('cache is empty! - returning none')
+        #     return None
+        return self.dict.get(key, None)
 
     def size(self):
         return len(self.list)
@@ -77,7 +79,7 @@ class FIFOCache(Cache):
     def available(self, key) -> bool:
         return key in self.dict
 
-    def put(self, key, value, file: File):
+    def put(self, key, value):
         if key in self.dict:
             self.list.remove(key)
         
@@ -85,4 +87,4 @@ class FIFOCache(Cache):
         self.dict[key] = value
 
         if(len(self.list) > self.capacity):
-            del dict[list.pop(0)]
+            del self.dict[self.list.pop(0)]

@@ -1,6 +1,6 @@
 [Simulation]
 
-Total_Requests = 2000
+Total_Requests = 10000
 Time_Limit = 600
 Num_Files = 10000
 Request_Rate = 50.0
@@ -10,7 +10,7 @@ Round_Trip_Mean = 0.5
 Round_Trip_SD = 0.4
 Pareto_Alpha = 2.0
 Cache_Size = 1000
-Cache_Type = LRU
+Cache_Type = FIFO
 
 [Debug]
 logging=True

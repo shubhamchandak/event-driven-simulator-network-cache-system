@@ -56,7 +56,7 @@ class Simulation:
         #print('request: {} has been served at {}'.format(request.get_requestid(), self.clock))
 
     def log_after_file_received(self, request: Request, total_time): # return (request_id, arrived_seq_id, total_response_time, cache_miss_rate, clock)
-        return (request.get_requestid(), self.num_of_request_served, total_time, self.cache_miss_count/self.num_of_request_served, self.clock)
+        return (request.get_requestid(), self.num_of_request_served, total_time, self.cache_miss_count/self.num_of_request, self.clock)
 
     def handle_arrive_at_queue_event(self, event: Event):
         request = event.get_request()

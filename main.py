@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 np.random.seed(0)
 
-config_paths = ['input.light','input.medium', 'input.heavy']
+config_paths = ['input.medium']
 
 for path in config_paths:
         
@@ -19,14 +19,14 @@ for path in config_paths:
     simulation = Simulation(configs)
     result_metrics = simulation.run() ##[(request_id, arrived_seq_id, request_response_time, cache_miss_rate, clock)]
 
-    res = sorted(result_metrics,key = lambda i: i[4])
-    x_clock = [res[i][4] for i in range(len(res))]
+    res = sorted(result_metrics,key = lambda i: i[0])
+    x_clock = [res[i][0] for i in range(len(res))]
     y_cache_miss_rate = [res[i][3] for i in range(len(res))]
-    plt.scatter(x_clock, y_cache_miss_rate)
+    plt.plot(x_clock, y_cache_miss_rate)
     plt.show() 
 
-    res = sorted(result_metrics,key = lambda i: i[0])
-    x_request_id = [res[i][0] for i in range(len(res))]
-    y_response_time = [res[i][2] for i in range(len(res))]
-    plt.plot(x_request_id, y_response_time)
-    plt.show()
+    # res = sorted(result_metrics,key = lambda i: i[0])
+    # x_request_id = [res[i][0] for i in range(len(res))]
+    # y_response_time = [res[i][2] for i in range(len(res))]
+    # plt.plot(x_request_id, y_response_time)
+    # plt.show()
