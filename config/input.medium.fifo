@@ -10,7 +10,3 @@ Round_Trip_SD = 0.4
 Pareto_Alpha = 2.0
 Cache_Size = 1000
 Cache_Type = FIFO
-
-[Debug]
-logging=True
-show_plot=False
